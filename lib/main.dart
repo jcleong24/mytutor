@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mytutor/models/user.dart';
 import 'package:mytutor/views/loginscreen.dart';
 
 void main() => runApp(MyApp());
@@ -16,7 +17,7 @@ class MyApp extends StatelessWidget {
         textTheme:
             GoogleFonts.anaheimTextTheme(Theme.of(context).textTheme.apply()),
       ),
-      home: const SplashScreen(title: 'SlumShop Admin'),
+      home: const SplashScreen(title: 'Mytutor'),
     );
   }
 }
@@ -33,7 +34,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     Timer(
-        const Duration(seconds: 3),
+        const Duration(seconds: 10),
         () => Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (content) => const LoginScreen())));
   }
