@@ -1,9 +1,15 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
+import 'package:mytutor/models/user.dart';
 import 'package:mytutor/views/regisscreen.dart';
-
+import 'package:mytutor/views/tutorscreen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../constants.dart';
+import 'package:sn_progress_dialog/sn_progress_dialog.dart';
+import 'mainscreen.dart';
+import '../models/user.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -17,6 +23,13 @@ class _LoginScreenState extends State<LoginScreen> {
   bool remember = false;
   TextEditingController emailCtrl = TextEditingController();
   TextEditingController passwordCtrl = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPref();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,88 +37,215 @@ class _LoginScreenState extends State<LoginScreen> {
     screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
         body: SingleChildScrollView(
-      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Padding(
-            padding: const EdgeInsets.fromLTRB(32, 16, 32, 0),
+      child: Center(
+        child: SizedBox(
+          width: screenWidth,
+          child: Form(
+            key: _formKey,
             child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(
-                      height: screenHeight / 2.5,
-                      width: screenWidth,
-                      child: Image.asset('assets/images/logo.png')),
-                  const Text("Login My TuTor App",
-                      style: TextStyle(fontSize: 24)),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-                    child: TextField(
-                      controller: emailCtrl,
-                      decoration: InputDecoration(
-                          hintText: "Email",
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(5.0))),
-                      keyboardType: TextInputType.emailAddress,
-                    ),
-                  ),
-                  Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
-                      child: TextField(
-                        controller: passwordCtrl,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(32, 32, 32, 32),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                          height: screenHeight / 2.5,
+                          width: screenWidth,
+                          child: Image.asset('assets/images/logo.png')),
+                      const Text(
+                        "Login",
+                        style: TextStyle(fontSize: 24),
+                      ),
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        controller: emailCtrl,
                         decoration: InputDecoration(
-                            hintText: "Password",
+                            labelText: 'Email',
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(5.0))),
-                        keyboardType: TextInputType.visiblePassword,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter valid email';
+                          }
+                          bool emailValid = RegExp(
+                                  r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                              .hasMatch(value);
+
+                          if (!emailValid) {
+                            return 'Please enter a valid email';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      TextFormField(
+                        controller: passwordCtrl,
                         obscureText: true,
-                      )),
-                  Row(
-                    children: [
-                      Checkbox(value: remember, onChanged: _OnRememberMe),
-                      const Text("Remember Me")
+                        decoration: InputDecoration(
+                            labelText: 'Password',
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(5.0))),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your password';
+                          }
+                          if (value.length < 6) {
+                            return "Password must be at least 6 characters";
+                          }
+                          return null;
+                        },
+                      ),
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: remember,
+                            onChanged: (bool? value) {
+                              _OnRememberMe(value!);
+                            },
+                          ),
+                          const Text("Remember Me")
+                        ],
+                      ),
+                      SizedBox(
+                        width: screenWidth,
+                        height: 50,
+                        child: ElevatedButton(
+                          child: const Text("Login"),
+                          onPressed: _loginUser,
+                        ),
+                      ),
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            const Text("Sign Up?  ",
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                  height: 2.0,
+                                )),
+                            GestureDetector(
+                                onTap: () => {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (BuildContext context) =>
+                                                  const RegisScreen()))
+                                    },
+                                child: const Text("Click here",
+                                    style: TextStyle(
+                                      fontSize: 16.0,
+                                      height: 2.0,
+                                      fontWeight: FontWeight.bold,
+                                      decoration: TextDecoration.underline,
+                                    )))
+                          ]),
                     ],
                   ),
-                  SizedBox(
-                      child: ElevatedButton(
-                    child: const Text("Login"),
-                    onPressed: _loginUser,
-                  )),
-                  MaterialButton(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5.0)),
-                    minWidth: 115,
-                    height: 50,
-                    child: const Text("Sign Up",
-                        style: TextStyle(decoration: TextDecoration.underline)),
-                    elevation: 10,
-                    onPressed: _registerAccount,
-                  ),
-                ]))
-      ]),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     ));
   }
 
-  void _OnRememberMe(bool? value) {
+  void _saveRemovePref(bool value) async {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      String email = emailCtrl.text;
+      String password = passwordCtrl.text;
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      if (value) {
+        await prefs.setString('email', email);
+        await prefs.setString('pass', password);
+        await prefs.setBool('remember', true);
+        Fluttertoast.showToast(
+            msg: "Preference Stored",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            fontSize: 14.0);
+      } else {
+        await prefs.setString('email', '');
+        await prefs.setString('pass', '');
+        await prefs.setBool('remember', false);
+        emailCtrl.text = "";
+        passwordCtrl.text = "";
+        Fluttertoast.showToast(
+            msg: "Preference Removed",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            fontSize: 14.0);
+      }
+    } else {
+      Fluttertoast.showToast(
+          msg: "Preference Failed",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          fontSize: 14.0);
+      remember = false;
+    }
+  }
+
+  void _OnRememberMe(bool value) {
+    remember = value;
     setState(() {
-      remember = value!;
+      if (remember) {
+        _saveRemovePref(true);
+      } else {
+        _saveRemovePref(false);
+      }
     });
+  }
+
+  Future<void> _loadPref() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String email = (prefs.getString('email')) ?? '';
+    String password = (prefs.getString('pass')) ?? '';
+    remember = (prefs.getBool('remember')) ?? false;
+
+    if (remember) {
+      setState(() {
+        emailCtrl.text = email;
+        passwordCtrl.text = password;
+        remember = true;
+      });
+    }
   }
 
   void _loginUser() {
     String _email = emailCtrl.text;
     String _password = passwordCtrl.text;
-    if (_email.isNotEmpty && _password.isNotEmpty) {
-      http.post(Uri.parse(CONSTANTS.server + "/mytutor/php/new_user.php"),
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      ProgressDialog pd = ProgressDialog(context: context);
+      pd.show(msg: 'Logging in..', max: 100);
+      http.post(
+          Uri.parse(
+              CONSTANTS.server + "/mytutor/php_folder/php/login_user.php"),
           body: {"email": _email, "password": _password}).then((response) {
         print(response.body);
-        if (response.body == "Success") {
+        var data = jsonDecode(response.body);
+        if (response.statusCode == 200 && data['status'] == 'success') {
+          User user = User.fromJson(data['data']);
+
           Fluttertoast.showToast(
               msg: "Success",
               toastLength: Toast.LENGTH_SHORT,
               gravity: ToastGravity.BOTTOM,
               timeInSecForIosWeb: 1,
               fontSize: 16.0);
-          // Navigator.pushReplacement(context,
-          //     MaterialPageRoute(builder: (content) => const RegisterPage()));
+          pd.update(value: 100, msg: "Completed");
+          pd.close();
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (content) => MainScreen()));
         } else {
           Fluttertoast.showToast(
               msg: "Failed",
@@ -113,38 +253,10 @@ class _LoginScreenState extends State<LoginScreen> {
               gravity: ToastGravity.BOTTOM,
               timeInSecForIosWeb: 1,
               fontSize: 16.0);
+          pd.update(value: 100, msg: "Failed");
+          pd.close();
         }
       });
     }
-  }
-
-  void _registerAccount() {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-              shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(20.0))),
-              title: const Text("Register new Account", style: TextStyle()),
-              content: const Text("Are you sure?", style: TextStyle()),
-              actions: <Widget>[
-                TextButton(
-                    child: const Text("Yes"),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (content) => const RegisScreen()));
-                    }),
-                TextButton(
-                    child: const Text(
-                      "No",
-                    ),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    }),
-              ]);
-        });
   }
 }
