@@ -1,33 +1,32 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import '../models/tutor.dart';
-import 'mainscreen.dart';
+import 'package:mytutor/views/loginscreen.dart';
+import '../constants.dart';
+import '../models/course.dart';
 import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import '../constants.dart';
 
-class TutorScreen extends StatefulWidget {
-  const TutorScreen({Key? key}) : super(key: key);
+class MainPage extends StatefulWidget {
+  const MainPage({key}) : super(key: key);
 
   @override
-  State<TutorScreen> createState() => _TutorScreenState();
+  State<MainPage> createState() => _MainScreenState();
 }
 
-class _TutorScreenState extends State<TutorScreen> {
-  var _tapPosition;
+class _MainScreenState extends State<MainPage> {
+  List<Course> courseList = <Course>[];
+  late double screenHeight, screenWidth, resWidth;
+  String titlecenter = "No Course Available, loading...";
   var numofpage, curpage = 1;
   var color;
-  List<Tutor> tutorList = <Tutor>[];
-  String titlecenter = "No Tutors Available, loading...";
-  late double screenHeight, screenWidth, resWidth;
-  TextEditingController searchCtrl = TextEditingController();
+  TextEditingController searchController = TextEditingController();
   String search = "";
 
   @override
   void initState() {
+    super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      _loadTutors(1, search);
+      _loadSubjects(1, search);
     });
   }
 
@@ -46,7 +45,7 @@ class _TutorScreenState extends State<TutorScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'MyTutor Tutors',
+          'MyTutor Courses',
         ),
         actions: [
           IconButton(
@@ -57,7 +56,7 @@ class _TutorScreenState extends State<TutorScreen> {
           ),
         ],
       ),
-      body: tutorList.isEmpty
+      body: courseList.isEmpty
           ? const Padding(
               padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
             )
@@ -69,10 +68,10 @@ class _TutorScreenState extends State<TutorScreen> {
                   child: GridView.count(
                       crossAxisCount: 2,
                       childAspectRatio: (1 / 1),
-                      children: List.generate(tutorList.length, (index) {
+                      children: List.generate(courseList.length, (index) {
                         return InkWell(
                           splashColor: Colors.red,
-                          onTap: () => {_loadTutorDetails(index)},
+                          onTap: () => {_loadSubjectDetails(index)},
                           child: Card(
                               color: Colors.white,
                               shape: RoundedRectangleBorder(
@@ -83,8 +82,8 @@ class _TutorScreenState extends State<TutorScreen> {
                                   flex: 6,
                                   child: CachedNetworkImage(
                                     imageUrl: CONSTANTS.server +
-                                        "/mytutor/mobile/assets/tutors/" +
-                                        tutorList[index].tutor_id.toString() +
+                                        "/mytutor/mobile/assets/courses/" +
+                                        courseList[index].subjectId.toString() +
                                         '.jpg',
                                     imageBuilder: (context, imageProvider) =>
                                         Container(
@@ -112,8 +111,8 @@ class _TutorScreenState extends State<TutorScreen> {
                                     child: Column(
                                       children: [
                                         Text(
-                                          tutorList[index]
-                                              .tutor_name
+                                          courseList[index]
+                                              .subjectName
                                               .toString(),
                                           style: const TextStyle(
                                               fontSize: 12,
@@ -127,18 +126,19 @@ class _TutorScreenState extends State<TutorScreen> {
                                           height: 5,
                                         ),
                                         Text(
-                                          "Email: " +
-                                              tutorList[index]
-                                                  .tutor_email
-                                                  .toString(),
+                                          "Price : RM " +
+                                              double.parse(courseList[index]
+                                                      .subjectPrice
+                                                      .toString())
+                                                  .toStringAsFixed(2),
                                           style: const TextStyle(
                                               fontSize: 12,
                                               fontWeight: FontWeight.bold),
                                         ),
                                         Text(
-                                          "Phone no: " +
-                                              tutorList[index]
-                                                  .tutor_phone
+                                          "Rating : " +
+                                              courseList[index]
+                                                  .subjectRating
                                                   .toString(),
                                           style: const TextStyle(
                                               fontSize: 12,
@@ -164,7 +164,7 @@ class _TutorScreenState extends State<TutorScreen> {
                     return SizedBox(
                       width: 40,
                       child: TextButton(
-                          onPressed: () => {_loadTutors(index + 1, "")},
+                          onPressed: () => {_loadSubjects(index + 1, "")},
                           child: Text(
                             (index + 1).toString(),
                             style: TextStyle(color: color),
@@ -177,10 +177,11 @@ class _TutorScreenState extends State<TutorScreen> {
     );
   }
 
-  void _loadTutors(int pageno, String _search) {
+  void _loadSubjects(int pageno, String _search) {
     curpage = pageno;
     numofpage ?? 1;
-    http.post(Uri.parse(CONSTANTS.server + "/mytutor/mobile/php/loadtutor.php"),
+    http.post(
+        Uri.parse(CONSTANTS.server + "/mytutor/mobile/php/loadcourse.php"),
         body: {
           'pageno': pageno.toString(),
           'search': _search,
@@ -198,23 +199,41 @@ class _TutorScreenState extends State<TutorScreen> {
       if (response.statusCode == 200 && jsondata['status'] == 'success') {
         var extractdata = jsondata['data'];
         numofpage = int.parse(jsondata['numofpage']);
-        if (extractdata['tutors'] != null) {
-          tutorList = <Tutor>[];
-          extractdata['tutors'].forEach((v) {
-            tutorList.add(Tutor.fromJson(v));
+        if (extractdata['subjects'] != null) {
+          courseList = <Course>[];
+          extractdata['subjects'].forEach((v) {
+            courseList.add(Course.fromJson(v));
           });
-          titlecenter = tutorList.length.toString() + " Tutors Available";
+          titlecenter = courseList.length.toString() + " Subjects Available";
         } else {
-          titlecenter = "No Tutors Available";
-          tutorList.clear();
+          titlecenter = "No Subject Available";
+          courseList.clear();
         }
         setState(() {});
       } else {
-        titlecenter = "No Tutors Available";
-        tutorList.clear();
+        titlecenter = "No Subject Available";
+        courseList.clear();
         setState(() {});
       }
     });
+  }
+
+  Widget _createDrawerItem(
+      {required IconData icon,
+      required String text,
+      required GestureTapCallback onTap}) {
+    return ListTile(
+      title: Row(
+        children: <Widget>[
+          Icon(icon),
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: Text(text),
+          )
+        ],
+      ),
+      onTap: onTap,
+    );
   }
 
   void _loadSearchDialog() {
@@ -233,9 +252,9 @@ class _TutorScreenState extends State<TutorScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       TextField(
-                        controller: searchCtrl,
+                        controller: searchController,
                         decoration: InputDecoration(
-                            labelText: 'Search for tutor namee',
+                            labelText: 'Search your intended subjects name',
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(5.0))),
                       ),
@@ -245,9 +264,9 @@ class _TutorScreenState extends State<TutorScreen> {
                 actions: [
                   ElevatedButton(
                     onPressed: () {
-                      search = searchCtrl.text;
+                      search = searchController.text;
                       Navigator.of(context).pop();
-                      _loadTutors(1, search);
+                      _loadSubjects(1, search);
                     },
                     child: const Text("Search"),
                   )
@@ -258,7 +277,7 @@ class _TutorScreenState extends State<TutorScreen> {
         });
   }
 
-  _loadTutorDetails(int index) {
+  _loadSubjectDetails(int index) {
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -266,7 +285,7 @@ class _TutorScreenState extends State<TutorScreen> {
             shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(20.0))),
             title: const Text(
-              "Tutors Details",
+              "Courses Details",
               style: TextStyle(),
             ),
             content: SingleChildScrollView(
@@ -274,8 +293,8 @@ class _TutorScreenState extends State<TutorScreen> {
               children: [
                 CachedNetworkImage(
                   imageUrl: CONSTANTS.server +
-                      "/mytutor/mobile/assets/tutors/" +
-                      tutorList[index].tutor_id.toString() +
+                      "/mytutor/mobile/assets/courses/" +
+                      courseList[index].subjectId.toString() +
                       '.jpg',
                   fit: BoxFit.cover,
                   width: resWidth,
@@ -284,17 +303,21 @@ class _TutorScreenState extends State<TutorScreen> {
                   errorWidget: (context, url, error) => const Icon(Icons.error),
                 ),
                 Text(
-                  tutorList[index].tutor_name.toString(),
+                  courseList[index].subjectName.toString(),
                   style: const TextStyle(
                       fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text("\nTutor: " + tutorList[index].tutor_name.toString()),
-                  Text("\nId:  " + tutorList[index].tutor_id.toString()),
-                  Text(
-                      "\nPhone no: " + tutorList[index].tutor_phone.toString()),
-                  Text("\nDescription: " +
-                      tutorList[index].tutor_description.toString()),
+                  Text("\nDescription: \n" +
+                      courseList[index].subjectDescription.toString()),
+                  Text("\nPrice: RM " +
+                      double.parse(courseList[index].subjectPrice.toString())
+                          .toStringAsFixed(2)),
+                  Text("\nSessions: " +
+                      courseList[index].subjectSessions.toString() +
+                      " classes"),
+                  Text("\nRatings: " +
+                      courseList[index].subjectRating.toString()),
                 ]),
               ],
             )),

@@ -8,6 +8,7 @@ import 'package:mytutor/views/tutorscreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../constants.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
+import 'mainpage.dart';
 import 'mainscreen.dart';
 import '../models/user.dart';
 
@@ -228,8 +229,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ProgressDialog pd = ProgressDialog(context: context);
       pd.show(msg: 'Logging in..', max: 100);
       http.post(
-          Uri.parse(
-              CONSTANTS.server + "/mytutor/php_folder/php/login_user.php"),
+          Uri.parse(CONSTANTS.server + "/mytutor/mobile/php/login_user.php"),
           body: {"email": _email, "password": _password}).then((response) {
         print(response.body);
         var data = jsonDecode(response.body);

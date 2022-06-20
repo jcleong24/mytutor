@@ -28,13 +28,13 @@ class Tutor {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['tutorId'] = tutor_id;
-    data['tutorEmail'] = tutor_email;
-    data['tutorPhone'] = tutor_phone;
-    data['TutorName'] = tutor_name;
-    data['TutorPassword'] = tutor_password;
-    data['TutorDescription'] = tutor_description;
-    data['TutorDatereg'] = tutor_datereg;
+    data['tutor_id'] = tutor_id;
+    data['tutor_email'] = tutor_email;
+    data['tutor_phone'] = tutor_phone;
+    data['Tutor_name'] = tutor_name;
+    data['Tutor_password'] = tutor_password;
+    data['Tutor_description'] = tutor_description;
+    data['Tutor_datereg'] = tutor_datereg;
 
     return data;
   }
