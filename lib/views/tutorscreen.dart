@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../models/tutor.dart';
 import 'mainscreen.dart';
 import 'package:http/http.dart' as http;
@@ -44,10 +45,31 @@ class _TutorScreenState extends State<TutorScreen> {
     }
 
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 247, 247, 247),
+      extendBody: true,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text(
-          'MyTutor Tutors',
+        systemOverlayStyle: SystemUiOverlayStyle.light,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(20),
+          ),
         ),
+        centerTitle: false,
+        elevation: 0,
+        backgroundColor: Colors.lightGreen,
+        title: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              Text('MY Tutor',
+                  style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 20,
+                      fontFamily: "Pacifico")),
+              Text('The art of teaching is the art of assisting discovery',
+                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
+            ]),
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
@@ -124,7 +146,7 @@ class _TutorScreenState extends State<TutorScreen> {
                                           softWrap: true,
                                         ),
                                         const SizedBox(
-                                          height: 5,
+                                          height: 2,
                                         ),
                                         Text(
                                           "Email: " +
@@ -132,7 +154,7 @@ class _TutorScreenState extends State<TutorScreen> {
                                                   .tutor_email
                                                   .toString(),
                                           style: const TextStyle(
-                                              fontSize: 12,
+                                              fontSize: 11,
                                               fontWeight: FontWeight.bold),
                                         ),
                                         Text(
@@ -141,7 +163,7 @@ class _TutorScreenState extends State<TutorScreen> {
                                                   .tutor_phone
                                                   .toString(),
                                           style: const TextStyle(
-                                              fontSize: 12,
+                                              fontSize: 11,
                                               fontWeight: FontWeight.bold),
                                         ),
                                       ],
@@ -225,9 +247,11 @@ class _TutorScreenState extends State<TutorScreen> {
           return StatefulBuilder(
             builder: (context, StateSetter setState) {
               return AlertDialog(
-                title: const Text(
-                  "Search ",
-                ),
+                title: const Text("Search Bar",
+                    style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 25,
+                        fontFamily: "Pacifico")),
                 content: SizedBox(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -235,7 +259,7 @@ class _TutorScreenState extends State<TutorScreen> {
                       TextField(
                         controller: searchCtrl,
                         decoration: InputDecoration(
-                            labelText: 'Search for tutor namee',
+                            labelText: 'Search for tutor name',
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(5.0))),
                       ),

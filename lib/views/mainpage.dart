@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mytutor/views/loginscreen.dart';
 import '../constants.dart';
 import '../models/course.dart';
@@ -43,10 +44,31 @@ class _MainScreenState extends State<MainPage> {
     }
 
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 247, 247, 247),
+      extendBody: true,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text(
-          'MyTutor Courses',
+        systemOverlayStyle: SystemUiOverlayStyle.light,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(20),
+          ),
         ),
+        centerTitle: false,
+        elevation: 0,
+        backgroundColor: Colors.lightGreen,
+        title: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              Text('MY Tutor',
+                  style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 20,
+                      fontFamily: "Pacifico")),
+              Text('The art of teaching is the art of assisting discovery',
+                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
+            ]),
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
@@ -123,7 +145,7 @@ class _MainScreenState extends State<MainPage> {
                                           softWrap: true,
                                         ),
                                         const SizedBox(
-                                          height: 5,
+                                          height: 2,
                                         ),
                                         Text(
                                           "Price : RM " +
@@ -132,7 +154,7 @@ class _MainScreenState extends State<MainPage> {
                                                       .toString())
                                                   .toStringAsFixed(2),
                                           style: const TextStyle(
-                                              fontSize: 12,
+                                              fontSize: 11,
                                               fontWeight: FontWeight.bold),
                                         ),
                                         Text(
@@ -141,7 +163,7 @@ class _MainScreenState extends State<MainPage> {
                                                   .subjectRating
                                                   .toString(),
                                           style: const TextStyle(
-                                              fontSize: 12,
+                                              fontSize: 11,
                                               fontWeight: FontWeight.bold),
                                         ),
                                       ],
@@ -244,9 +266,11 @@ class _MainScreenState extends State<MainPage> {
           return StatefulBuilder(
             builder: (context, StateSetter setState) {
               return AlertDialog(
-                title: const Text(
-                  "Search ",
-                ),
+                title: const Text("Search Bar",
+                    style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 25,
+                        fontFamily: "Pacifico")),
                 content: SizedBox(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -254,9 +278,9 @@ class _MainScreenState extends State<MainPage> {
                       TextField(
                         controller: searchController,
                         decoration: InputDecoration(
-                            labelText: 'Search your intended subjects name',
+                            labelText: 'Search for subjects',
                             border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(5.0))),
+                                borderRadius: BorderRadius.circular(25.0))),
                       ),
                     ],
                   ),
@@ -308,16 +332,17 @@ class _MainScreenState extends State<MainPage> {
                       fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text("\nDescription: \n" +
+                  Text("\nDescription: " +
                       courseList[index].subjectDescription.toString()),
-                  Text("\nPrice: RM " +
+                  Text("\nTutor ID: " + courseList[index].tutorId.toString()),
+                  Text("Price: RM " +
                       double.parse(courseList[index].subjectPrice.toString())
                           .toStringAsFixed(2)),
-                  Text("\nSessions: " +
+                  Text("Sessions: " +
                       courseList[index].subjectSessions.toString() +
                       " classes"),
-                  Text("\nRatings: " +
-                      courseList[index].subjectRating.toString()),
+                  Text(
+                      "Ratings: " + courseList[index].subjectRating.toString()),
                 ]),
               ],
             )),

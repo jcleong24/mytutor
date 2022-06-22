@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import '../models/user.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mytutor/models/user.dart';
@@ -10,6 +10,7 @@ void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final User user;
     return MaterialApp(
       title: 'My Tutor',
       theme: ThemeData(
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
         textTheme:
             GoogleFonts.anaheimTextTheme(Theme.of(context).textTheme.apply()),
       ),
-      home: const SplashScreen(title: 'Mytutor'),
+      home: SplashScreen(title: 'Mytutor'),
     );
   }
 }

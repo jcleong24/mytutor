@@ -10,7 +10,6 @@ import '../constants.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 import 'mainpage.dart';
 import 'mainscreen.dart';
-import '../models/user.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -237,7 +236,7 @@ class _LoginScreenState extends State<LoginScreen> {
           User user = User.fromJson(data['data']);
 
           Fluttertoast.showToast(
-              msg: "Success",
+              msg: "Login Success",
               toastLength: Toast.LENGTH_SHORT,
               gravity: ToastGravity.BOTTOM,
               timeInSecForIosWeb: 1,
@@ -245,7 +244,11 @@ class _LoginScreenState extends State<LoginScreen> {
           pd.update(value: 100, msg: "Completed");
           pd.close();
           Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (content) => MainScreen()));
+              context,
+              MaterialPageRoute(
+                  builder: (content) => MainScreen(
+                        user: user,
+                      )));
         } else {
           Fluttertoast.showToast(
               msg: "Failed",

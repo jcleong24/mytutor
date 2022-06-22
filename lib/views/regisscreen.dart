@@ -310,8 +310,7 @@ class _RegisScreenState extends State<RegisScreen> {
     String _userpassword2 = password2Ctrl.text;
     String _useraddress = addressCtrl.text;
     String base64Image = base64Encode(_image!.readAsBytesSync());
-    http.post(
-        Uri.parse(CONSTANTS.server + "/mytutor/php_folder/php/new_user.php"),
+    http.post(Uri.parse(CONSTANTS.server + "/mytutor/mobile/php/new_user.php"),
         body: {
           "name": _username,
           "email": _useremail,
@@ -325,7 +324,7 @@ class _RegisScreenState extends State<RegisScreen> {
       var data = jsonDecode(response.body);
       if (response.statusCode == 200 && data['status'] == 'success') {
         Fluttertoast.showToast(
-            msg: "Success",
+            msg: "Register Success",
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
             timeInSecForIosWeb: 1,
