@@ -6,6 +6,7 @@ class Tutor {
   String? tutor_password;
   String? tutor_description;
   String? tutor_datereg;
+  String? subjectName;
 
   Tutor(
       {this.tutor_id,
@@ -14,7 +15,8 @@ class Tutor {
       this.tutor_name,
       this.tutor_password,
       this.tutor_description,
-      this.tutor_datereg});
+      this.tutor_datereg,
+      this.subjectName});
 
   Tutor.fromJson(Map<String, dynamic> json) {
     tutor_id = json["tutor_id"];
@@ -24,17 +26,21 @@ class Tutor {
     tutor_password = json["tutor_password"];
     tutor_description = json["tutor_description"];
     tutor_datereg = json["tutor_datereg"];
+    subjectName = json['subject_name'];
   }
+
+  get tutorPhoneNumber => null;
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['tutor_id'] = tutor_id;
     data['tutor_email'] = tutor_email;
     data['tutor_phone'] = tutor_phone;
-    data['Tutor_name'] = tutor_name;
-    data['Tutor_password'] = tutor_password;
-    data['Tutor_description'] = tutor_description;
-    data['Tutor_datereg'] = tutor_datereg;
+    data['tutor_name'] = tutor_name;
+    data['tutor_password'] = tutor_password;
+    data['tutor_description'] = tutor_description;
+    data['tutor_datereg'] = tutor_datereg;
+    data['subject_name'] = subjectName;
 
     return data;
   }

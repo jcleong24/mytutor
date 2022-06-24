@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../models/course.dart';
 import '../models/tutor.dart';
 import 'mainscreen.dart';
 import 'package:http/http.dart' as http;
@@ -312,14 +313,18 @@ class _TutorScreenState extends State<TutorScreen> {
                   style: const TextStyle(
                       fontSize: 16, fontWeight: FontWeight.bold),
                 ),
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text("\nTutor: " + tutorList[index].tutor_name.toString()),
-                  Text("\nId:  " + tutorList[index].tutor_id.toString()),
-                  Text(
-                      "\nPhone no: " + tutorList[index].tutor_phone.toString()),
-                  Text("\nDescription: " +
-                      tutorList[index].tutor_description.toString()),
-                ]),
+                Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Text("\nId:  " + tutorList[index].tutor_id.toString()),
+                      Text("Tutor: " + tutorList[index].tutor_name.toString()),
+                      Text("Phone no: " +
+                          tutorList[index].tutor_phone.toString()),
+                      Text("\n       Subject owned: \n" +
+                          tutorList[index].subjectName.toString()),
+                      Text("\nDescription: " +
+                          tutorList[index].tutor_description.toString()),
+                    ]),
               ],
             )),
           );

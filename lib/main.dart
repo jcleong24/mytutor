@@ -47,7 +47,7 @@ class _SplashScreenState extends State<SplashScreen> {
       Container(
         decoration: const BoxDecoration(
             image: DecorationImage(
-                image: AssetImage('assets/images/mytutor.jpeg'),
+                image: AssetImage('assets/images/mytutor.png'),
                 fit: BoxFit.cover)),
       ),
       Padding(
@@ -55,13 +55,17 @@ class _SplashScreenState extends State<SplashScreen> {
           child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: const [
-                Text("SlumShop",
+                Text("MY Tutor",
                     style: TextStyle(
-                        fontSize: 40,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.amber)),
-                CircularProgressIndicator(),
-                Text("Version 0.1",
+                        fontSize: 50,
+                        fontWeight: FontWeight.w500,
+                        color: Color.fromARGB(255, 130, 106, 106),
+                        fontFamily: "Pacifico")),
+                CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                      Color.fromARGB(255, 7, 42, 104)),
+                ),
+                Text("Version 10.0",
                     style:
                         TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ])),
